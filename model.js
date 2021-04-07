@@ -6,7 +6,7 @@ import Light from './light.js';
 
 export default class Model
 {
-	constructor(name, gl, mesh, color, light, reflCoeffs = [1.0,1.0,1.0], shininess = 32, distAttenConst = [1.0,0.5,0.1])
+	constructor(name, gl, mesh, color, light, reflCoeffs = [1.0,1.0,1.0], shininess = 32, distAttenConst = [0.5,1.5,1.0])
 	{
 		this.name = name;
 		this.gl = gl;
@@ -117,11 +117,6 @@ export default class Model
 			if(lights[i].enabled)	illum[i] = 1.0;
 		}
 		this.gl.uniform1fv(shader.uniform("illum"), [...illum]);
-
-
-
-
-
 
 		// shader.setUniformMatrix4fv(uSceneTransformMatrix, sceneTransformMatrix);
 		this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.mesh.indexBuffer);

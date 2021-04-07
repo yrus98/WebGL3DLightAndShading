@@ -9,6 +9,7 @@ export default class Light{
 		this.position =  position;
 		this.enabled = true;
 
+		//cube vertices for debugging light
 		this.vertices = [
 		  // Front face
 		  -1.0, -1.0,  1.0,

@@ -28,6 +28,8 @@ let axisLabels = ['X','Y','Z'];
 // let shapeNames = ['Rectangle','Square','Circle'];
 let resetBtn = document.getElementById('resetBtn');
 let keyRecordiv = document.getElementById('keyRecord');
+let debugCheckbox = document.getElementById('debugCheckbox');
+let debugLights = false;
 let selMode = 'o';
 let renMode = 'o';
 
@@ -268,8 +270,19 @@ function mousemove(event) {
 			// mat4.multiply(QuatRot, QMat, QuatRot);
 			let currQ = mat4.create();
 			mat4.copy(currQ, models[selObject].transform.getRotateQuat());
-			mat4.multiply(currQ, QMat, currQ);
-			models[selObject].transform.setRotateQuat(currQ);
+			mat4.multiply(QMat, QMat, currQ);
+			models[selObject].transform.setRotateQuat(QMat);
+
+			models[selObject].transform.updateMVPMatrixNew();
+
+			let t = vec3.create();
+			vec3.copy(t, models[selObject].light.position);
+			let tm = mat4.create();
+			mat4.invert(tm, models[selObject].transform.getMVPMatrix());
+			vec3.transformMat4(t, t, tm);
+
+			if(!checkPointInBoundingBox(t, models[selObject].getBoundingBox()))
+				models[selObject].transform.setRotateQuat(currQ);
 		// console.log(currQ);
 		}
 
@@ -429,6 +442,7 @@ shaderBtn.addEventListener("click", changeShader);
 selLightBtn.addEventListener("click", changeSelectedLight); 
 axisBtn.addEventListener("click", changeTranslationAxis); 
 resetBtn.addEventListener("click", resetScene); 
+debugCheckbox.addEventListener("click", enableDebugLights); 
 
 
 
@@ -502,10 +516,11 @@ function animate()
 		shader = shadersList[shaderForObjects[index]];
 		shader.use();
 		model.draw(shader, VPMatrix, lights);
-
-		shader = debugShader;
-		shader.use();
-		model.light.draw(shader, gl, VPMatrix);
+		if(debugLights){
+			shader = debugShader;
+			shader.use();
+			model.light.draw(shader, gl, VPMatrix);
+		}
 	
 	});
 
@@ -518,13 +533,18 @@ animate();
 
 
 function resetScene(){
-	controlMode = 'c';
+	// controlMode = 'c';
 	models.forEach(function(model, index, arr){
 		let temp = vec3.fromValues(triangleVertices[index * 3], triangleVertices[index * 3 + 1], triangleVertices[index * 3 + 2]);
 		model.transform.setTranslate(temp);
 		model.transform.setScale(vec3.fromValues(initModelScales[index],initModelScales[index],initModelScales[index]));
 		model.transform.setRotate(0, vec3.fromValues(0,1,0));	
 		model.transform.setRotateQuat(mat4.create());
+
+		let s = initModelScales[index];
+		let bb = model.getBoundingBox();
+		model.light.position = vec3.fromValues(s*(((bb[0] + bb[1])/-2) + bb[0]), s*(((bb[2] + bb[3])/-2) +bb[3]),s *(((bb[4] + bb[5])/-2)+bb[5]));
+
 
 		let t = model.light.position;
 		t[0] += temp[0];
@@ -562,8 +582,20 @@ function stepD(){
 }
 
 function scaleObj(factor){
-	let s = factor * models[selObject].transform.getScale();
+
+	let currScale = models[selObject].transform.getScale()
+	let s = factor * currScale;
 	models[selObject].transform.setScale(vec3.fromValues(s,s,s));
+	models[selObject].transform.updateMVPMatrixNew();
+
+	let t = vec3.create();
+	vec3.copy(t, models[selObject].light.position);
+	let tm = mat4.create();
+	mat4.invert(tm, models[selObject].transform.getMVPMatrix());
+	vec3.transformMat4(t, t, tm);
+
+	if(!checkPointInBoundingBox(t, models[selObject].getBoundingBox()))
+		models[selObject].transform.setScale(vec3.fromValues(currScale,currScale,currScale));
 }
 
 function translateLight(index, axis, value){
@@ -571,23 +603,30 @@ function translateLight(index, axis, value){
 	let t = vec3.create();
 	vec3.copy(t, lights[index].position);
 	t[axis] += value;
-	let temp = vec3.create(), temp2 = vec3.create();
-	vec3.copy(temp, models[index].transform.translateCenter);
-	vec3.copy(temp2, models[index].transform.translate);
-	t[0] = ((t[0] - temp2[0])/models[index].transform.getScale()) - temp[0];
-	t[1] = ((t[1] - temp2[1])/models[index].transform.getScale()) - temp[1];
-	t[2] = ((t[2] - temp2[2])/models[index].transform.getScale()) - temp[2];
+	let tm = mat4.create();
+	mat4.invert(tm, models[index].transform.getMVPMatrix());
+	vec3.transformMat4(t, t, tm);
+	// let temp = vec3.create(), temp2 = vec3.create();
+	// vec3.copy(temp, models[index].transform.translateCenter);
+	// vec3.copy(temp2, models[index].transform.translate);
+	// t[0] = ((t[0] - temp2[0])/models[index].transform.getScale()) - temp[0];
+	// t[1] = ((t[1] - temp2[1])/models[index].transform.getScale()) - temp[1];
+	// t[2] = ((t[2] - temp2[2])/models[index].transform.getScale()) - temp[2];
 
-	if(checkPointInBoundingBox(index, t, models[index].getBoundingBox()))
+	if(checkPointInBoundingBox(t, models[index].getBoundingBox()))
 		lights[index].position[axis] += value;
 	// console.log(lights);
 	// console.log(models[selLight].transform.getTranslate(), models[selLight].transform.getScale());
 }
 
-function checkPointInBoundingBox(index, point, bb, scl = 1.25){
+function checkPointInBoundingBox(point, bb, scl = 1.25){
 	for(let i=0; i< 3; i++){
 		if(point[i]<(scl * bb[2 * i]) || point[i]>(scl * bb[(2 * i) + 1]))
 			return false;
 	}
 	return true;
+}
+
+function enableDebugLights(){
+	debugLights = debugCheckbox.checked;
 }
