@@ -29,12 +29,12 @@ const vertexShaderSrcGouraud = `
             // gl_Position = uProject * uView * uModelTransformMatrix * vec4(aPosition, 1.0); 
             gl_Position = uMVPMatrix * vec4(aPosition, 1.0); 
 
-            // vec3 vFragPos = vec3(uMVPMatrix * vec4(aPosition, 1.0));
-            vec3 vFragPos = vec3(uModelMatrix * vec4(aPosition, 1.0));
+            vec3 vFragPos = vec3(uMVPMatrix * vec4(aPosition, 1.0));
+            // vec3 vFragPos = vec3(uModelMatrix * vec4(aPosition, 1.0));
 
           vec3 N, L, H, V; //vec3 R;
-          // N = normalize(mat3(uMVPMatrix) * aNormal);
-          N = normalize(mat3(uModelInverseTransposeMatrix) * aNormal);
+          N = normalize(mat3(uMVPMatrix) * aNormal);
+          // N = normalize(mat3(uModelInverseTransposeMatrix) * aNormal);
           V = normalize( vFragPos);
 
           float d = 0.0;

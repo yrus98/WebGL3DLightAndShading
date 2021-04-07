@@ -138,7 +138,7 @@ window.onload = function(){
 		  .then(response => response.text())
 		  .then(text => {
 			let mesh = new objLoader.Mesh(text);
-			let model = new Model('Puppy', gl, mesh, vec3.fromValues(1,0.8,0), lights[0], [0.8,0.6,0.9], 24);
+			let model = new Model('Puppy', gl, mesh, vec3.fromValues(1,0.8,0), lights[0], [0.8,0.6,0.9], 64);
 			let s = 0.05;
 			vec3.set(scale, s, s, s);
 			model.transform.setScale(scale);
@@ -574,9 +574,9 @@ function translateLight(index, axis, value){
 	let temp = vec3.create(), temp2 = vec3.create();
 	vec3.copy(temp, models[index].transform.translateCenter);
 	vec3.copy(temp2, models[index].transform.translate);
-	t[0] = ((t[0] - temp2[0])/initModelScales[index]) - temp[0];
-	t[1] = ((t[1] - temp2[1])/initModelScales[index]) - temp[1];
-	t[2] = ((t[2] - temp2[2])/initModelScales[index]) - temp[2];
+	t[0] = ((t[0] - temp2[0])/models[index].transform.getScale()) - temp[0];
+	t[1] = ((t[1] - temp2[1])/models[index].transform.getScale()) - temp[1];
+	t[2] = ((t[2] - temp2[2])/models[index].transform.getScale()) - temp[2];
 
 	if(checkPointInBoundingBox(index, t, models[index].getBoundingBox()))
 		lights[index].position[axis] += value;
