@@ -30,6 +30,8 @@ let resetBtn = document.getElementById('resetBtn');
 let keyRecordiv = document.getElementById('keyRecord');
 let debugCheckbox = document.getElementById('debugCheckbox');
 let debugLights = false;
+let snackbar = document.getElementById('snackbar');
+
 let selMode = 'o';
 let renMode = 'o';
 
@@ -281,8 +283,10 @@ function mousemove(event) {
 			mat4.invert(tm, models[selObject].transform.getMVPMatrix());
 			vec3.transformMat4(t, t, tm);
 
-			if(!checkPointInBoundingBox(t, models[selObject].getBoundingBox()))
+			if(!checkPointInBoundingBox(t, models[selObject].getBoundingBox())){
 				models[selObject].transform.setRotateQuat(currQ);
+				showSnackbar();
+			}
 		// console.log(currQ);
 		}
 
@@ -550,7 +554,8 @@ function resetScene(){
 		t[0] += temp[0];
 		t[1] += temp[1];
 		t[2] += temp[2];
-		model.light.position = t;		
+		model.light.position = t;	
+		model.light.enabled = true;	
 	});
 	// lights.pos = [vec3.fromValues(1,0,0), vec3.fromValues(10,10,-10), vec3.fromValues(8, -8, 8)];
 	// lights.illum = [1.0,1.0,1.0];
@@ -594,8 +599,10 @@ function scaleObj(factor){
 	mat4.invert(tm, models[selObject].transform.getMVPMatrix());
 	vec3.transformMat4(t, t, tm);
 
-	if(!checkPointInBoundingBox(t, models[selObject].getBoundingBox()))
+	if(!checkPointInBoundingBox(t, models[selObject].getBoundingBox())){
 		models[selObject].transform.setScale(vec3.fromValues(currScale,currScale,currScale));
+		showSnackbar();
+	}
 }
 
 function translateLight(index, axis, value){
@@ -606,17 +613,11 @@ function translateLight(index, axis, value){
 	let tm = mat4.create();
 	mat4.invert(tm, models[index].transform.getMVPMatrix());
 	vec3.transformMat4(t, t, tm);
-	// let temp = vec3.create(), temp2 = vec3.create();
-	// vec3.copy(temp, models[index].transform.translateCenter);
-	// vec3.copy(temp2, models[index].transform.translate);
-	// t[0] = ((t[0] - temp2[0])/models[index].transform.getScale()) - temp[0];
-	// t[1] = ((t[1] - temp2[1])/models[index].transform.getScale()) - temp[1];
-	// t[2] = ((t[2] - temp2[2])/models[index].transform.getScale()) - temp[2];
-
-	if(checkPointInBoundingBox(t, models[index].getBoundingBox()))
+	if(checkPointInBoundingBox(t, models[index].getBoundingBox())){
 		lights[index].position[axis] += value;
-	// console.log(lights);
-	// console.log(models[selLight].transform.getTranslate(), models[selLight].transform.getScale());
+	}else{
+		showSnackbar();
+	}
 }
 
 function checkPointInBoundingBox(point, bb, scl = 1.25){
@@ -629,4 +630,9 @@ function checkPointInBoundingBox(point, bb, scl = 1.25){
 
 function enableDebugLights(){
 	debugLights = debugCheckbox.checked;
+}
+
+function showSnackbar() {
+  snackbar.className = "show";
+  setTimeout(function(){ snackbar.className = snackbar.className.replace("show", ""); }, 2000);
 }
