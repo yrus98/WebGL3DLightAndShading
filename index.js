@@ -15,6 +15,8 @@ import debugFragmentShaderSrc from './fragmentDebug.js';
 import Renderer from './renderer.js';
 import Transform from './transform.js'
 import Model from './model.js';
+import Axis from './axis.js';
+
 import Light from './light.js';
 
 let controlBtn = document.getElementById('modeBtn');
@@ -137,7 +139,25 @@ mat4.multiply(VPMatrix, projectMatrix, VPMatrix);
 
 
 window.onload = function(){
-	
+	fetch('./Models/axes.obj')
+		  .then(response => response.text())
+		  .then(text => {
+
+		  	// X-axis
+		  	let mesh = new objLoader.Mesh(text);
+			let axis = new Axis(gl, mesh, vec3.fromValues(1.0, 0, 0), vec3.fromValues(0.15, 0.15, 0.15),-Math.PI/2, vec3.fromValues(0, 0, 1.0));
+			axes.push(axis);
+
+			//Y-axis
+			// mesh = new objLoader.Mesh(text);
+			axis = new Axis(gl, mesh, vec3.fromValues(0, 1.0, 0), vec3.fromValues(0.15, 0.15, 0.15),0, vec3.fromValues(0, 1.0, 0));
+			axes.push(axis);
+
+			//Z-axis
+			// mesh = new objLoader.Mesh(text);
+			axis = new Axis(gl, mesh, vec3.fromValues(0, 0, 1.0), vec3.fromValues(0.15, 0.15, 0.15),-Math.PI/2, vec3.fromValues(-1.0, 0, 0));
+			axes.push(axis);
+	});
 	fetch('./Models/Puppy.obj')
 		  .then(response => response.text())
 		  .then(text => {
@@ -502,10 +522,11 @@ function animate()
 	// mat4.multiply(VPMatrix, viewMatrix, VPMatrix);
 	// mat4.multiply(VPMatrix, projectMatrix, VPMatrix);
 
-	// axes.forEach(function(axis, index, arr){
-	// 	axis.transform.updateMVPMatrixForAxes(camRotationAngles, selRotationAxis);
-	// 	axis.draw(shader, VPMatrix, true);
-	// });
+	axes.forEach(function(axis, index, arr){
+		shader = debugShader;
+		shader.use();
+		axis.draw(shader);
+	});
 
 	
 	models.forEach(function(model, index, arr){
