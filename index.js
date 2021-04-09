@@ -227,6 +227,10 @@ function mousedown(event) {
 	const clipCoordinates = renderer.mouseToClipCoord(mouseX,mouseY);
 	isMouseDragging = true;
 	// console.log(lights);
+	if(event.which == 1)
+		keyRecord.innerHTML = 'LeftClick';
+	else if(event.which == 3)
+		keyRecord.innerHTML = 'RightClick';
 }
 
 function mouseup(event) {
