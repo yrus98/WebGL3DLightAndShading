@@ -1,5 +1,3 @@
-// http://www.cs.toronto.edu/~jacobson/phong-demo/
-// http://math.hws.edu/graphicsbook/c4/s1.html
 import { vec3, vec4, mat4, quat } from 'https://cdn.skypack.dev/gl-matrix';
 import objLoader from 'https://cdn.skypack.dev/webgl-obj-loader';
 
@@ -20,14 +18,13 @@ import Axis from './axis.js';
 import Light from './light.js';
 
 let controlBtn = document.getElementById('modeBtn');
-// let controlModeNames = ['Drawing','Instance-Transformation','Scene-Transformation'];
+// let controlModeNames = ['Default Scene', 'Mesh transformation mode','Shading Model choice mode','Illuminator mode'];
 let selObjBtn = document.getElementById('selObjBtn');
 let shaderBtn = document.getElementById('shaderBtn');
 let selLightBtn = document.getElementById('selLightBtn');
 
 let axisBtn = document.getElementById('axisBtn');
 let axisLabels = ['X','Y','Z'];
-// let shapeNames = ['Rectangle','Square','Circle'];
 let resetBtn = document.getElementById('resetBtn');
 let keyRecordiv = document.getElementById('keyRecord');
 let debugCheckbox = document.getElementById('debugCheckbox');
@@ -59,8 +56,6 @@ const models = [];
 const axes = [];
 
 const initModelScales = [];
-//const initColors = [];
-//const initColorsSum = [];
 const primColors = [vec4.fromValues(1,1,0,1), vec4.fromValues(0,1,1,1), vec4.fromValues(1,0.5,0.5,1)];
 
 
@@ -69,7 +64,6 @@ let shapeMode = 0;
 
 let currActiveModelIndex = -1;
 
-// const gui = new dat.GUI();
 
 let translation = vec3.create();
 let rotationAngle = 0;
@@ -80,13 +74,6 @@ let globCenterX = 0, globCenterY = 0;
 let globalTransform = new Transform(0,0);
 let sceneTransformMatrix = mat4.create();
 
-// const transformSettings = {
-// 	translateX :0.0,
-// 	translateY :0.0,
-// 	scale :1.0,
-// 	rotationAngle: 0
-// };
-// let scaleCon = gui.add(transformSettings, 'scale', 0.0, 2.0, 0.02);
 
 let triangleVertices = [0.5, 0, 0,
 						-0.25, 0, -0.433,
@@ -121,12 +108,6 @@ light = new Light(vec3.fromValues(0.4,0.4,0.4), vec3.fromValues(0, 0.8, 0.8), ve
 lights.push(light);
 light = new Light(vec3.fromValues(0.4,0.4,0.4), vec3.fromValues(0.7, 0, 0.3), vec3.fromValues(1.0,0.0,0.3), vec3.fromValues(8,-8,8));
 lights.push(light);
-// lights.pos = [vec3.fromValues(1,0,0), vec3.fromValues(10,10,-10), vec3.fromValues(8, -8, 8)];
-// lights.ambientColors = [vec3.fromValues(0.4,0.4,0.4), vec3.fromValues(0.4,0.4,0.4), vec3.fromValues(0.4,0.4,0.4)];
-// lights.diffuseColors = [vec3.fromValues(0.6, 0.6, 0.6), vec3.fromValues(0, 0.8, 0.8), vec3.fromValues(0.7, 0.7, 0)];
-// lights.specularColors = [vec3.fromValues(1.0,1.0,1.0), vec3.fromValues(0.0,1.0,1.0), vec3.fromValues(1.0,1.0,0.0)];
-// lights.illum = [1.0,1.0,1.0];
-
 
 const VPMatrix = mat4.create();
 const projectMatrix = mat4.create();
@@ -168,8 +149,6 @@ window.onload = function(){
 			model.transform.setScale(scale);
 			models.push(model);
 			initModelScales.push(s);
-//			//initColors.push(vec3.fromValues(1,0.8,0));
-//			initColorsSum.push(1.8*255);
 			s = s * 1.0;
 			let bb = model.getBoundingBox();
 			model.light.position = vec3.fromValues(s*(((bb[0] + bb[1])/-2) + bb[0]), s*(((bb[2] + bb[3])/-2) +bb[3]),s *(((bb[4] + bb[5])/-2)+bb[5]));
@@ -184,8 +163,6 @@ window.onload = function(){
 			model.transform.setScale(scale);
 			models.push(model);
 			initModelScales.push(s);
-//			initColors.push(vec3.fromValues(0,0.6,0));
-//			initColorsSum.push(0.6*255);
 
 			s = s * 1.0;
 			let bb = model.getBoundingBox();
@@ -201,8 +178,6 @@ window.onload = function(){
 			model.transform.setScale(scale);
 			models.push(model);
 			initModelScales.push(s);
-//			initColors.push(vec3.fromValues(0.8,0.2,0.8));
-//			initColorsSum.push(1.2*255);
 		  	s = s * 1.0;
 			let bb = model.getBoundingBox();
 			model.light.position = vec3.fromValues(s*(((bb[0] + bb[1])/-2) + bb[0]), s*(((bb[2] + bb[3])/-2) +bb[2]),s *(((bb[4] + bb[5])/-2)+bb[5]));
@@ -333,23 +308,6 @@ function mousemove(event) {
 	lastX = mouseX;
 	lastY = mouseY;
 }
-
-// Convert mouse click to coordinate system as understood by webGL
-// renderer.getCanvas().addEventListener('click', (event) =>
-// {
-// 	// captImageBtn.setAttribute('href', gl.canvas.toDataURL("image/jpeg", 1));
-	
-// 	let mouseX = event.clientX;
-// 	let mouseY = event.clientY;
-
-// 	let rect = renderer.getCanvas().getBoundingClientRect();
-// 	mouseX = mouseX - rect.left;
-// 	mouseY = mouseY - rect.top;
-
-// 	const clipCoordinates = renderer.mouseToClipCoord(mouseX,mouseY);
-
-	
-// });
 
 window.addEventListener('keydown', function (event){
 	keyRecord.innerHTML = event.key;

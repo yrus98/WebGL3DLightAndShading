@@ -32,10 +32,8 @@ export default class Axis
 		const aPosition = shader.attribute("aPosition");
 		this.gl.enableVertexAttribArray(aPosition);
 
-		// objLoader.initMeshBuffers(this.gl, this.mesh);
 
 		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.mesh.vertexBuffer);
-		// this.gl.bufferData(this.gl.ARRAY_BUFFER, this.mesh.vertices, this.gl.STATIC_DRAW);
 
 		this.gl.vertexAttribPointer(aPosition, this.mesh.vertexBuffer.itemSize, this.gl.FLOAT, false, 0, 0);
 
@@ -48,7 +46,6 @@ export default class Axis
 		this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.mesh.indexBuffer);
 
 		this.gl.drawElements(this.gl.TRIANGLES, this.mesh.indexBuffer.numItems, this.gl.UNSIGNED_SHORT, 0);
-	// this.gl.drawArrays(this.gl.TRIANGLES, 0, this.mesh.vertices.length/3);
 	}
 
 	setColor(color){
